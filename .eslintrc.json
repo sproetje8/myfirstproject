@@ -1,13 +1,21 @@
 {
-	"extends": ["airbnb-base", "prettier", "plugin:node/recommended"],
-	"plugins": ["prettier"],    
+	"extends": [
+		"airbnb-base",
+		"prettier"
+	],
+	"plugins": [
+		"prettier"
+	],
 	"rules": {
 		"prettier/prettier": "error",
 		"no-unused-vars": "warn",
 		"no-console": "off",
+		"no-tabs": "off",
 		"func-names": "off",
 		"no-alert": "off",
 		"object-shorthand": "off",
-		"class-methods-use-this": "off"
+		"class-methods-use-this": "off",
+		"no-use-before-define": "off",
+		"newline-after-var": "error"
 	}
 }

@@ -1,26 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>My Translator</title>
-    </head>
-    <body>
-        <div class="dropdown">
-            <button onclick="myFunction()" class="dropbtn">English</button>
-            <div id="myDropdown" class="dropdown-content">
-                <a href="#">Chinese</a>
-                <a href="#">English</a>
-                <a href="#">Russian</a>
-            </div>
-        </div>
-        <button></button>
-        <div>
-            <input />
-        </div>
-        <button></button>
-        <div>
-            <textarea disabled></textarea>
-        </div>
-    </body>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>My Translator</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+	<div class="container">
+		<div class="dropdown" id="original-container">
+			<button class="dropbtn" id="srcLangDropBtn">English</button>
+			<div id="srcLangDropdown" class="dropdown-content">
+				<ul style="list-style: none;" class="srcLangList">
+					<li class="srcLang" id="chinese">Chinese</li>
+					<li class="srcLang" id="english">English</li>
+					<li class="srcLang" id="russian">Russian</li>
+				</ul>
+			</div>
+			<div>
+				<input />
+			</div>
+		</div>
+		<div class="dropdown" id="translation-container">
+			<button class="dropbtn" id="targLangDropBtn">English</button>
+			<div id="targLangDropdown" class="dropdown-content">
+				<ul style="list-style: none;" class="targLangList">
+					<li class="targLang" id="chinese">Chinese</li>
+					<li class="targLang" id="english">English</li>
+					<li class="targLang" id="russian">Russian</li>
+				</ul>
+			</div>
+		</div>
+		<button></button>
+		<div>
+			<textarea disabled></textarea>
+		</div>
+	</div>
+	<script src="myTranslator.js"></script>
+</body>
+
 </html>
