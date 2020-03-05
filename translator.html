@@ -13,12 +13,10 @@
 				<select class="langs-list" id="src-langs-list">
 					<option
 						class="langs-list-item"
-						id="langs-list-item-initial"
-						value="en"
-					>
+						id="src-langs-list-item-initial"
+						value="en">
 						English
 					</option>
-					<option class="langs-list-item" value=""> </option>
 				</select>
 				<div>
 					<textarea
@@ -34,7 +32,10 @@
 			<button type="button" class="switch-lang">&#8596;</button>
 			<div class="text-field" id="text-field-translation">
 				<select class="langs-list" id="targ-langs-list">
-					<option class="langs-list-item" value="">
+					<option 
+						class="langs-list-item"
+						id="targ-langs-list-item-initial"
+						value="ru">
 						Russian
 					</option>
 				</select>
@@ -58,5 +59,6 @@
 		</div>
 		<script src="JS/config.js"></script>
 		<script src="JS/translator.js"></script>
+		<script src="JS/main.js"></script>
 	</body>
 </html>

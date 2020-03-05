@@ -1,24 +1,35 @@
 const translator = {
-	getLangs: function (ui, callback) {
-		fetch(`${apiAddress}getLangs?ui=${ui}&key=${apiKey}`)
+	getLangs: async function (ui, languageListObject) {
+		await fetch(`${apiAddress}getLangs?ui=${ui}&key=${apiKey}`)
 			.then(response => response.json())
-			.then(result => callback(result.langs));
+			.then(result => languageListObject = result.langs);
+		await populateLanguageList(languageListObject);
+		
+		return languageListObject;
 	},
 	detect: function (text, callback) {
 		fetch(`${apiAddress}detect?text=${encodeURI(text)}&key=${apiKey}`)
 			.then(response => response.json())
-			.then(result => callback(result.lang));
+			.then(result => {
+				if (typeof callback === 'function') callback(result.lang);
+			});
 	},
 	translate: function (text, lang, format, callback) {
 		fetch(`${apiAddress}translate?text=${encodeURI(text)}&key=${apiKey}&lang=${lang}&format=${format}`)
-		.then(response => response.json())
-		.then(result => callback(result.text));
+			.then(response => response.json())
+			.then(result => {
+				if (typeof callback === 'function') callback(result.text);
+			});
 	}
 };
 
-translator.getLangs()
+// translator.getLangs('en', console.log);
 
-translator.translate('My book is closed. I forgot on what page I was.', 'en-ru', 'plain', console.log);
+// translator.detect('หนูมัสคแร็ต', console.log);
+// translator.detect('ბომონერი', console.log);
+
+// translator.translate('ბომონერი', 'ka-zh', 'plain', console.log);
+// translator.translate('我是俄国人', 'zh-ru', 'plain', console.log);
 
 
 
