@@ -89,8 +89,9 @@ textarea {
 	width: 542px;
 	height: 146px;
 	background-color: ivory;
-	font-size: 20px;
 	border: none;
+	font-size: 20px;
+	color: grey;
 }
 
 .output {

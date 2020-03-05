@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="styles.css" />
+		<title>My Translator</title>
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="text-field" id="text-field-original">
+				<select class="langs-list" id="src-langs-list">
+					<option
+						class="langs-list-item"
+						id="langs-list-item-initial"
+						value="en"
+					>
+						English
+					</option>
+					<option class="langs-list-item" value=""> </option>
+				</select>
+				<div>
+					<textarea
+						class="input"
+						id="src-text"
+						cols="50"
+						rows="9"
+						maxlength="10000"
+						placeholder="Enter your text"
+					></textarea>
+				</div>
+			</div>
+			<button type="button" class="switch-lang">&#8596;</button>
+			<div class="text-field" id="text-field-translation">
+				<select class="langs-list" id="targ-langs-list">
+					<option class="langs-list-item" value="">
+						Russian
+					</option>
+				</select>
+				<div>
+					<textarea
+						class="output"
+						id="targlang"
+						cols="50"
+						rows="9"
+						maxlength="10000"
+						disabled
+					>
+					</textarea>
+					<label for="targlang"
+						><a href="http://translate.yandex.ru/">
+							Переведено сервисом «Яндекс.Переводчик»
+						</a></label
+					>
+				</div>
+			</div>
+		</div>
+		<script src="JS/config.js"></script>
+		<script src="JS/translator.js"></script>
+	</body>
+</html>
