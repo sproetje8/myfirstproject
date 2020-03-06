@@ -19,27 +19,44 @@
 let languageListObject = {};
 
 async function wrapper() {
-	languageListObject = await translator.getLangs('en', languageListObject);
+	languageListObject = await translator.getLangs('en', languageListObject, populateLanguageList);
 }
 
 wrapper();
 
 // create for each value of languageListObject an option element in the DOM to fill the language list
-function populateLanguageList (object) {
-	let languageArray = Object.values(object).sort();
+function populateLanguageList (langsListObj) {
+	let sortableLangsList = [];
+
+	for (let abbrev in langsListObj) {
+		sortableLangsList.push([abbrev, langsListObj[abbrev]]);
+	}
+
+	function compareByLang(a, b) {
+		if (a[1] < b[1]) return -1;
+		if (a[1] > b[1]) return 1;
+		return 0;
+	}
+	 
+	let sortedLangsArray = sortableLangsList.sort(compareByLang);
+	
+	console.log(sortedLangsArray);
+
 	let selectSrcLang = document.getElementById('src-langs-list');
 	let selectTargLang = document.getElementById('targ-langs-list');
 
-	languageArray.forEach(language => {
+	sortedLangsArray.forEach( (language, i) => {
 		let optSrc = document.createElement('option');
 		let optTarg = document.createElement('option');
 
-		optSrc.text = language;
-		optSrc.value = language;
-		optTarg.text = language;
-		optTarg.value = language;
+		optSrc.text = sortedLangsArray[i][1];
+		optSrc.value = sortedLangsArray[i][0];
+		optTarg.text = sortedLangsArray[i][1];
+		optTarg.value = sortedLangsArray[i][0];
 
 		selectSrcLang.add(optSrc);
 		selectTargLang.add(optTarg);
 	});
 }
+
+// think about how to get what user typed and send it to yandex

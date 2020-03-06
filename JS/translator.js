@@ -1,10 +1,10 @@
 const translator = {
-	getLangs: async function (ui, languageListObject) {
+	getLangs: async function (ui, languageListObject, callback) {
 		await fetch(`${apiAddress}getLangs?ui=${ui}&key=${apiKey}`)
 			.then(response => response.json())
 			.then(result => languageListObject = result.langs);
-		await populateLanguageList(languageListObject);
-		
+		await callback(languageListObject);
+
 		return languageListObject;
 	},
 	detect: function (text, callback) {
