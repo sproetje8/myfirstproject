@@ -60,3 +60,37 @@ function populateLanguageList (langsListObj) {
 }
 
 // think about how to get what user typed and send it to yandex
+const inputDebouncer = debounce(getOriginalText, 2000);
+
+document
+	.getElementById('src-text')
+	.addEventListener('keyup', inputDebouncer);
+
+function getOriginalText () {
+	let text = document.getElementById('src-text').value;
+	let translation = '';
+
+	let lang = 'en-ru';
+
+	translator.translate(text, lang, translation, renderTranslation);
+}
+
+function debounce (func, delay) {
+	let timer;
+	
+	return function() {
+		let context = this;
+		let args = arguments;
+
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			func.apply(context, args);
+		}, delay);
+	};
+}
+
+function renderTranslation (translation) {
+	const translationField = document.getElementById('translation');
+	console.log(translation);
+	translationField.innerText = translation;
+}
