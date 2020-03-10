@@ -4,16 +4,16 @@
 // 5.Паттерны проектирования (Observer, Singleton, Factory...)
 
 // populate the dropdown menus with the language list
+let srcLang = '';
+let targLang = '';
+let srcText = '';
 
 // const form = {
 // 	srcLang,
 // 	targLang,
 // 	srcText,
 // 	translation,
-// 	srcLanguageList: languageList,
-// 	targLanguageList: languageList,
 // }
-
 
 // callback should get the result (result.langs) in the form of an object and save it in a variable (languageListObject)
 let languageListObject = {};
@@ -39,8 +39,6 @@ function populateLanguageList (langsListObj) {
 	}
 	 
 	let sortedLangsArray = sortableLangsList.sort(compareByLang);
-	
-	console.log(sortedLangsArray);
 
 	let selectSrcLang = document.getElementById('src-langs-list');
 	let selectTargLang = document.getElementById('targ-langs-list');
@@ -53,6 +51,14 @@ function populateLanguageList (langsListObj) {
 		optSrc.value = sortedLangsArray[i][0];
 		optTarg.text = sortedLangsArray[i][1];
 		optTarg.value = sortedLangsArray[i][0];
+
+		if (optSrc.value === 'en') {
+			optSrc.setAttribute('selected', 'selected');
+		}
+
+		if (optTarg.value === 'ru') {
+			optTarg.setAttribute('selected', 'selected');
+		}
 
 		selectSrcLang.add(optSrc);
 		selectTargLang.add(optTarg);
@@ -67,12 +73,12 @@ document
 	.addEventListener('keyup', inputDebouncer);
 
 function getOriginalText () {
-	let text = document.getElementById('src-text').value;
-	let translation = '';
+	srcText = document.getElementById('src-text').value;
+	// let translation = [];
 
-	let lang = 'en-ru';
+	lang = 'en-ru';
 
-	translator.translate(text, lang, translation, renderTranslation);
+	translator.translate(srcText, lang, translation, renderTranslation);
 }
 
 function debounce (func, delay) {
@@ -91,6 +97,5 @@ function debounce (func, delay) {
 
 function renderTranslation (translation) {
 	const translationField = document.getElementById('translation');
-	console.log(translation);
 	translationField.innerText = translation;
 }
