@@ -14,9 +14,8 @@ async function init() {
 	const GETLANGSURL = await composeGetLangsURL(CONFIG);
 	await getLanguageList(GETLANGSURL);
 	await addListenerToSrcLangBtn();
-	await addListenerToTargLangBtn();	
-	// const DETECTURL = composeDetectURL(CONFIG);
-	// const TRANSLATEURL= composeTranslateURL(CONFIG);
+	await addListenerToTargLangBtn();
+	await addListenerToInput();
 }
 
 init();
@@ -82,6 +81,7 @@ function addListenerToSrcLangBtn() {
 
 function setSrcLang (event) {
 	srcLang = event.target.value;
+	getOriginalText();
 }
 
 function addListenerToTargLangBtn() {
@@ -92,14 +92,17 @@ function addListenerToTargLangBtn() {
 
 function setTargLang (event) {
 	targLang = event.target.value;
+	getOriginalText();
 }
 
 // think about how to get what user typed and send it to yandex
 const inputDebouncer = debounce(getOriginalText, 2000);
 
-document
-	.getElementById('src-text')
-	.addEventListener('keyup', inputDebouncer);
+function addListenerToInput () {
+	document
+		.getElementById('src-text')
+		.addEventListener('keyup', inputDebouncer);
+}
 
 function getOriginalText () {
 	srcText = document.getElementById('src-text').value;
