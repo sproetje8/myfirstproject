@@ -4,65 +4,94 @@
 // 5.Паттерны проектирования (Observer, Singleton, Factory...)
 
 // populate the dropdown menus with the language list
-let srcLang = '';
-let targLang = '';
+let srcLang = 'en';
+let targLang = 'ru';
 let srcText = '';
+let languageListObject;
 
-// const form = {
-// 	srcLang,
-// 	targLang,
-// 	srcText,
-// 	translation,
-// }
-
-// callback should get the result (result.langs) in the form of an object and save it in a variable (languageListObject)
-let languageListObject = {};
-
-async function wrapper() {
-	languageListObject = await translator.getLangs('en', languageListObject, populateLanguageList);
+async function init() {
+	const CONFIG = await getConfig();
+	const GETLANGSURL = await composeGetLangsURL(CONFIG);
+	await getLanguageList(GETLANGSURL);
+	await addListenerToSrcLangBtn();
+	await addListenerToTargLangBtn();	
+	// const DETECTURL = composeDetectURL(CONFIG);
+	// const TRANSLATEURL= composeTranslateURL(CONFIG);
 }
 
-wrapper();
+init();
+
+function composeGetLangsURL(CONFIG) {
+	url = `${CONFIG.apiAddress}getLangs?ui=${srcLang}&key=${CONFIG.apiKey}`;
+
+	return url;
+}
+
+async function getLanguageList(GETLANGSURL) {
+	languageListObject = await translator.getLangs(GETLANGSURL);
+	sortLanguageList(languageListObject);
+
+	return languageListObject;
+}
+
+function sortLanguageList() {
+	let sortedLangsArray = Object.entries(languageListObject).sort(compareByLang);
+
+	populateLanguageList(sortedLangsArray);
+}
+
+function compareByLang(a, b) {
+	if (a[1] < b[1]) return -1;
+	if (a[1] > b[1]) return 1;
+	return 0;
+}
 
 // create for each value of languageListObject an option element in the DOM to fill the language list
-function populateLanguageList (langsListObj) {
-	let sortableLangsList = [];
-
-	for (let abbrev in langsListObj) {
-		sortableLangsList.push([abbrev, langsListObj[abbrev]]);
-	}
-
-	function compareByLang(a, b) {
-		if (a[1] < b[1]) return -1;
-		if (a[1] > b[1]) return 1;
-		return 0;
-	}
-	 
-	let sortedLangsArray = sortableLangsList.sort(compareByLang);
-
+function populateLanguageList (sortedLangsArray) {
 	let selectSrcLang = document.getElementById('src-langs-list');
 	let selectTargLang = document.getElementById('targ-langs-list');
+	
+	sortedLangsArray.forEach( (language) => {
+		let optionSrc = document.createElement('option');
+		let optionTarg = document.createElement('option');
 
-	sortedLangsArray.forEach( (language, i) => {
-		let optSrc = document.createElement('option');
-		let optTarg = document.createElement('option');
+		let abbrIndex = 0;
+		let fullLanguageIndex = 1;
+		
+		optionSrc.text = optionTarg.text = language[fullLanguageIndex];
+		optionSrc.value = optionTarg.value = language[abbrIndex];
 
-		optSrc.text = sortedLangsArray[i][1];
-		optSrc.value = sortedLangsArray[i][0];
-		optTarg.text = sortedLangsArray[i][1];
-		optTarg.value = sortedLangsArray[i][0];
-
-		if (optSrc.value === 'en') {
-			optSrc.setAttribute('selected', 'selected');
+		if (optionSrc.value === srcLang) {
+			optionSrc.setAttribute("selected", "selected");
 		}
 
-		if (optTarg.value === 'ru') {
-			optTarg.setAttribute('selected', 'selected');
+		if (optionTarg.value === targLang) {
+			optionTarg.setAttribute("selected", "selected");
 		}
 
-		selectSrcLang.add(optSrc);
-		selectTargLang.add(optTarg);
+		selectSrcLang.add(optionSrc);
+		selectTargLang.add(optionTarg);
 	});
+}
+
+function addListenerToSrcLangBtn() {
+	let selectSrcLang = document.getElementById('src-langs-list');
+
+	selectSrcLang.addEventListener('change', setSrcLang);
+}
+
+function setSrcLang (event) {
+	srcLang = event.target.value;
+}
+
+function addListenerToTargLangBtn() {
+	let selectTargLang = document.getElementById('targ-langs-list');
+
+	selectTargLang.addEventListener('change', setTargLang);
+}
+
+function setTargLang (event) {
+	targLang = event.target.value;
 }
 
 // think about how to get what user typed and send it to yandex
@@ -74,11 +103,14 @@ document
 
 function getOriginalText () {
 	srcText = document.getElementById('src-text').value;
-	// let translation = [];
-
-	lang = 'en-ru';
-
+	composeLang();
+	
 	translator.translate(srcText, lang, translation, renderTranslation);
+}
+
+function composeLang() {
+	return lang = `${srcLang}-${targLang}`;
+
 }
 
 function debounce (func, delay) {
