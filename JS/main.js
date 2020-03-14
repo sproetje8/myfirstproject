@@ -16,14 +16,25 @@ async function init() {
 	await addListenerToSrcLangBtn();
 	await addListenerToTargLangBtn();
 	await addListenerToInput();
+	await addListenerToLangSwitch();
 }
 
 init();
 
 function composeGetLangsURL(CONFIG) {
-	url = `${CONFIG.apiAddress}getLangs?ui=${srcLang}&key=${CONFIG.apiKey}`;
+	let getLangsUrl = `${CONFIG.apiAddress}getLangs?ui=${srcLang}&key=${CONFIG.apiKey}`;
 
-	return url;
+	return getLangsUrl;
+}
+
+// function composeDetectUrl(CONFIG) {
+// 	let detectUrl = `${apiAddress}detect?text=${encodeURI(text)}&key=${apiKey}`;
+
+// 	return detectUrl;
+// }
+
+function composeTranslateURL(CONFIG) {
+	return translateUrl = `${apiAddress}translate?text=${encodeURI(srcText)}&key=${apiKey}&lang=${lang}`;
 }
 
 async function getLanguageList(GETLANGSURL) {
@@ -35,8 +46,9 @@ async function getLanguageList(GETLANGSURL) {
 
 function sortLanguageList() {
 	let sortedLangsArray = Object.entries(languageListObject).sort(compareByLang);
-
 	populateLanguageList(sortedLangsArray);
+	
+	return sortedLangsArray;
 }
 
 function compareByLang(a, b) {
@@ -46,26 +58,26 @@ function compareByLang(a, b) {
 }
 
 // create for each value of languageListObject an option element in the DOM to fill the language list
-function populateLanguageList (sortedLangsArray) {
+function populateLanguageList(sortedLangsArray) {
 	let selectSrcLang = document.getElementById('src-langs-list');
 	let selectTargLang = document.getElementById('targ-langs-list');
-	
-	sortedLangsArray.forEach( (language) => {
+
+	sortedLangsArray.forEach((language) => {
 		let optionSrc = document.createElement('option');
 		let optionTarg = document.createElement('option');
 
 		let abbrIndex = 0;
 		let fullLanguageIndex = 1;
-		
+
 		optionSrc.text = optionTarg.text = language[fullLanguageIndex];
 		optionSrc.value = optionTarg.value = language[abbrIndex];
-
+		
 		if (optionSrc.value === srcLang) {
-			optionSrc.setAttribute("selected", "selected");
+			optionSrc.setAttribute('selected', 'selected');
 		}
 
 		if (optionTarg.value === targLang) {
-			optionTarg.setAttribute("selected", "selected");
+			optionTarg.setAttribute('selected', 'selected');
 		}
 
 		selectSrcLang.add(optionSrc);
@@ -79,47 +91,125 @@ function addListenerToSrcLangBtn() {
 	selectSrcLang.addEventListener('change', setSrcLang);
 }
 
-function setSrcLang (event) {
-	srcLang = event.target.value;
-	getOriginalText();
-}
-
 function addListenerToTargLangBtn() {
 	let selectTargLang = document.getElementById('targ-langs-list');
 
 	selectTargLang.addEventListener('change', setTargLang);
 }
 
-function setTargLang (event) {
-	targLang = event.target.value;
-	getOriginalText();
+function addListenerToLangSwitch() {
+	let langSwitch = document.getElementById('switch-lang');
+
+	langSwitch.addEventListener('click', switchLanguages);
 }
 
-// think about how to get what user typed and send it to yandex
 const inputDebouncer = debounce(getOriginalText, 2000);
 
-function addListenerToInput () {
+function addListenerToInput() {
 	document
 		.getElementById('src-text')
 		.addEventListener('keyup', inputDebouncer);
 }
 
-function getOriginalText () {
-	srcText = document.getElementById('src-text').value;
-	composeLang();
+function setSrcLang(event) {
+	let selectID = 'src-langs-list';
+	let elementValue = event.target.value;
 	
-	translator.translate(srcText, lang, translation, renderTranslation);
+	unselect(selectID, srcLang);
+	srcLang = elementValue;
+	select(selectID, srcLang);
+	getOriginalText();
+
+	return srcLang;
+}
+
+function setTargLang(event) {
+	let selectID = 'targ-langs-list';
+	let elementValue = event.target.value;
+	
+	unselect(selectID, targLang);
+	targLang = elementValue;
+	select(selectID, targLang);
+	getOriginalText();
+
+	return targLang;
+}
+
+function unselect(selectID, language) {
+	let selectElement = document.getElementById(selectID);
+	let selectOptions = selectElement.options;
+
+	for (let opt, i = 0; opt = selectOptions[i]; i++) {
+		if (opt.value === language) {
+			selectElement.selectedIndex = i;
+			selectElement.options[selectElement.selectedIndex].removeAttribute('selected');
+			break;
+		}
+	}
+
+	return selectElement;
+}
+
+function select(selectID, optionValToSelect) {
+	let selectElement = document.getElementById(selectID);
+	let selectOptions = selectElement.options;
+
+	for (let opt, i = 0; opt = selectOptions[i]; i++) {
+		if (opt.value === optionValToSelect) {
+			selectElement.selectedIndex = i;
+			selectElement.options[selectElement.selectedIndex].setAttribute('selected', 'selected');
+			selectElement.text = opt.text;
+			break;
+		}
+	}
+}
+
+function switchLanguages() {
+	swapSrcAndTargLangs();
+	swapSrcTextAndTranslation();
+	getOriginalText();
+}
+
+function swapSrcAndTargLangs() {
+	console.log('swapping src and targ languages');
+}
+
+function swapSrcTextAndTranslation() {
+	let srcTextValue = document.getElementById('src-text').value;
+	let translationValue = document.getElementById('translation').value;
+
+	srcText = translationValue;
+	targLang = srcTextValue;
+
+	document.getElementById('src-text').value = srcText;
+	document.getElementById('translation').value = targLang;
+}
+
+// think about how to get what user typed and send it to yandex
+function getOriginalText() {
+	srcText = document.getElementById('src-text').value;
+	getTranslation(srcText);
+
+	return srcText;
+}
+
+async function getTranslation() {
+	lang = composeLang();
+	translateUrl = composeTranslateURL();
+	let translation = await translator.translate(translateUrl);
+	renderTranslation(translation);
+
+	return translation;
 }
 
 function composeLang() {
 	return lang = `${srcLang}-${targLang}`;
-
 }
 
-function debounce (func, delay) {
+function debounce(func, delay) {
 	let timer;
-	
-	return function() {
+
+	return function () {
 		let context = this;
 		let args = arguments;
 
@@ -130,7 +220,7 @@ function debounce (func, delay) {
 	};
 }
 
-function renderTranslation (translation) {
+function renderTranslation(translation) {
 	const translationField = document.getElementById('translation');
 	translationField.innerText = translation;
 }

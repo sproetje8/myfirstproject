@@ -27,7 +27,7 @@ body {
 	border: 2px solid grey;
 }
 
-.switch-lang {
+#switch-lang {
 	position: relative;
 	padding: 0;
 	margin: 0;
