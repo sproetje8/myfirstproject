@@ -8,20 +8,24 @@ let srcLang = 'en';
 let targLang = 'ru';
 let srcText = '';
 let languageListObject;
+let CONFIG = {};
 
 async function init() {
-	const CONFIG = await getConfig();
-	const GETLANGSURL = await composeGetLangsURL(CONFIG);
+	CONFIG = await getConfig();
+	Object.freeze(CONFIG);
+	const GETLANGSURL = await composeGetLangsURL();
 	await getLanguageList(GETLANGSURL);
 	await addListenerToSrcLangBtn();
 	await addListenerToTargLangBtn();
 	await addListenerToInput();
 	await addListenerToLangSwitch();
+
+	return CONFIG;
 }
 
 init();
 
-function composeGetLangsURL(CONFIG) {
+function composeGetLangsURL() {
 	let getLangsUrl = `${CONFIG.apiAddress}getLangs?ui=${srcLang}&key=${CONFIG.apiKey}`;
 
 	return getLangsUrl;
@@ -34,7 +38,10 @@ function composeGetLangsURL(CONFIG) {
 // }
 
 function composeTranslateURL(CONFIG) {
-	return translateUrl = `${apiAddress}translate?text=${encodeURI(srcText)}&key=${apiKey}&lang=${lang}`;
+	let lang = composeLang();
+	let translateUrl = `${CONFIG.apiAddress}translate?text=${encodeURI(srcText)}&key=${CONFIG.apiKey}&lang=${lang}`;
+
+	return translateUrl;
 }
 
 async function getLanguageList(GETLANGSURL) {
@@ -47,7 +54,7 @@ async function getLanguageList(GETLANGSURL) {
 function sortLanguageList() {
 	let sortedLangsArray = Object.entries(languageListObject).sort(compareByLang);
 	populateLanguageList(sortedLangsArray);
-	
+
 	return sortedLangsArray;
 }
 
@@ -71,7 +78,7 @@ function populateLanguageList(sortedLangsArray) {
 
 		optionSrc.text = optionTarg.text = language[fullLanguageIndex];
 		optionSrc.value = optionTarg.value = language[abbrIndex];
-		
+
 		if (optionSrc.value === srcLang) {
 			optionSrc.setAttribute('selected', 'selected');
 		}
@@ -114,7 +121,7 @@ function addListenerToInput() {
 function setSrcLang(event) {
 	let selectID = 'src-langs-list';
 	let elementValue = event.target.value;
-	
+
 	unselect(selectID, srcLang);
 	srcLang = elementValue;
 	select(selectID, srcLang);
@@ -126,7 +133,7 @@ function setSrcLang(event) {
 function setTargLang(event) {
 	let selectID = 'targ-langs-list';
 	let elementValue = event.target.value;
-	
+
 	unselect(selectID, targLang);
 	targLang = elementValue;
 	select(selectID, targLang);
@@ -135,12 +142,12 @@ function setTargLang(event) {
 	return targLang;
 }
 
-function unselect(selectID, language) {
+function unselect(selectID, languageAbbr) {
 	let selectElement = document.getElementById(selectID);
 	let selectOptions = selectElement.options;
 
 	for (let opt, i = 0; opt = selectOptions[i]; i++) {
-		if (opt.value === language) {
+		if (opt.value === languageAbbr) {
 			selectElement.selectedIndex = i;
 			selectElement.options[selectElement.selectedIndex].removeAttribute('selected');
 			break;
@@ -164,40 +171,56 @@ function select(selectID, optionValToSelect) {
 	}
 }
 
-function switchLanguages() {
-	swapSrcAndTargLangs();
-	swapSrcTextAndTranslation();
+async function switchLanguages() {
+	await swapSrcAndTargLangs();
+	await moveTranslationToSourceText();
 	getOriginalText();
 }
 
 function swapSrcAndTargLangs() {
-	console.log('swapping src and targ languages');
+	let selectSrcID = 'src-langs-list';
+	let selectTargID = 'targ-langs-list';
+
+	let selectSrcValue = document.getElementById(selectSrcID).value;
+	let selectTargValue = document.getElementById(selectTargID).value;
+
+	unselect(selectSrcID, selectSrcValue);
+	unselect(selectTargID, selectTargValue);
+	select(selectSrcID, selectTargValue);
+	select(selectTargID, selectSrcValue);
+
+	srcLang = selectTargValue;
+	targLang = selectSrcValue;
+
+	return srcLang, targLang;
 }
 
-function swapSrcTextAndTranslation() {
-	let srcTextValue = document.getElementById('src-text').value;
+function moveTranslationToSourceText() {
 	let translationValue = document.getElementById('translation').value;
 
 	srcText = translationValue;
-	targLang = srcTextValue;
-
 	document.getElementById('src-text').value = srcText;
-	document.getElementById('translation').value = targLang;
+
+	return srcText;
 }
 
 // think about how to get what user typed and send it to yandex
 function getOriginalText() {
 	srcText = document.getElementById('src-text').value;
-	getTranslation(srcText);
+
+	if (srcText !== '' && srcText !== ' ') {
+		getTranslation(srcText);
+
+		return srcText;
+	}
 
 	return srcText;
 }
 
 async function getTranslation() {
-	lang = composeLang();
-	translateUrl = composeTranslateURL();
+	translateUrl = await composeTranslateURL(CONFIG);
 	let translation = await translator.translate(translateUrl);
-	renderTranslation(translation);
+	await renderTranslation(translation);
 
 	return translation;
 }
