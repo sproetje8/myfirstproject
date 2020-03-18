@@ -26,22 +26,22 @@ async function init() {
 init();
 
 function composeGetLangsURL() {
-	let getLangsUrl = `${CONFIG.apiAddress}getLangs?ui=${srcLang}&key=${CONFIG.apiKey}`;
+	let getLangsURL = `${CONFIG.apiAddress}getLangs?ui=${srcLang}&key=${CONFIG.apiKey}`;
 
-	return getLangsUrl;
+	return getLangsURL;
 }
 
-// function composeDetectUrl(CONFIG) {
-// 	let detectUrl = `${apiAddress}detect?text=${encodeURI(text)}&key=${apiKey}`;
+function composeDetectURL() {
+	let detectURL = `${CONFIG.apiAddress}detect?text=${encodeURI(srcText)}&key=${CONFIG.apiKey}`;
 
-// 	return detectUrl;
-// }
+	return detectURL;
+}
 
-function composeTranslateURL(CONFIG) {
+function composeTranslateURL() {
 	let lang = composeLang();
-	let translateUrl = `${CONFIG.apiAddress}translate?text=${encodeURI(srcText)}&key=${CONFIG.apiKey}&lang=${lang}`;
+	let translateURL = `${CONFIG.apiAddress}translate?text=${encodeURI(srcText)}&key=${CONFIG.apiKey}&lang=${lang}`;
 
-	return translateUrl;
+	return translateURL;
 }
 
 async function getLanguageList(GETLANGSURL) {
@@ -218,11 +218,25 @@ function getOriginalText() {
 }
 
 async function getTranslation() {
-	translateUrl = await composeTranslateURL(CONFIG);
-	let translation = await translator.translate(translateUrl);
+	srcLang = await detectSrcLang();
+	translateURL = await composeTranslateURL(CONFIG);
+	let translation = await translator.translate(translateURL);
 	await renderTranslation(translation);
 
 	return translation;
+}
+
+async function detectSrcLang() {
+	let selectSrcID = 'src-langs-list';
+	
+	unselect(selectSrcID, srcLang);
+
+	detectURL = await composeDetectURL();
+	srcLang = await translator.detect(detectURL);
+
+	select(selectSrcID, srcLang);
+
+	return srcLang;
 }
 
 function composeLang() {

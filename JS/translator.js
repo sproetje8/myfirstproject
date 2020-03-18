@@ -6,15 +6,15 @@ const translator = {
 		
 		return languageListObject;
 	},
-	detect: function (text, callback) {
-		fetch(`${apiAddress}detect?text=${encodeURI(text)}&key=${apiKey}`)
-			.then(response => response.json())
-			.then(result => {
-				if (typeof callback === 'function') callback(result.lang);
-			});
+	detect: async function (detectURL) {
+		let response = await fetch(detectURL);
+		let result = await response.json();
+		let detectedSrcLang = result.lang;
+		
+		return detectedSrcLang;
 	},
-	translate: async function (translateUrl) {
-		let response = await fetch(translateUrl);
+	translate: async function (translateURL) {
+		let response = await fetch(translateURL);
 		let result = await response.json();
 		translation = result.text;
 		
