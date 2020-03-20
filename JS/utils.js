@@ -1,4 +1,4 @@
-const inputDebouncer = debounce(getOriginalText, 2000);
+const inputDebouncer = debounce(createTranslation, 2000);
 
 function debounce(func, delay) {
 	let timer;
@@ -14,10 +14,20 @@ function debounce(func, delay) {
 	};
 }
 
-function switchLanguages() {
+async function createTranslation() {
+	appState.srcText = getOriginalText();
+	detectedSrcLang = await getDetectedSrcLang(appState.srcText);
+	appState.srcLang = appState.srcLang || detectedSrcLang;
+	let lang = composeLang();
+	let translateURL = urlHelper.composeTranslateURL(lang);
+	let translation = await translator.translate(translateURL);
+	renderTranslation(translation);
+}
+
+function switchBtnHandler() {
 	swapSrcAndTargLangs();
-	moveTranslationToSourceText();
-	getTranslation();
+	moveTranslationToInput();
+	createTranslation();
 }
 
 function swapSrcAndTargLangs() {
@@ -36,21 +46,14 @@ function swapSrcAndTargLangs() {
 	appState.targLang = selectSrcValue;
 }
 
-function moveTranslationToSourceText() {
-	let translationValue = document.getElementById('translation').value;
-
-	appState.srcText = translationValue;
-	document.getElementById('src-text').value = appState.srcText;
-}
-
 function srcLangBtnHandler(event) {
 	setSrcLang(event);
-	getTranslation();
+	createTranslation();
 }
 
 function targLangBtnHandler(event) {
 	setTargLang(event);
-	getTranslation();
+	createTranslation();
 }
 
 function setSrcLang(event) {
@@ -67,42 +70,25 @@ function setTargLang(event) {
 	unselect(selectID, appState.targLang);
 	appState.targLang = elementValue;
 	select(selectID, appState.targLang);
-}	
+}
 
 // think about how to get what user typed and send it to yandex
-async function getTranslation() {
-	appState.srcText = getOriginalText();
-	appState.srcLang = appState.srcLang || await detectSrcLang();
-	let lang = composeLang();
-	let translateURL = urlHelper.composeTranslateURL(lang);
-	let translation = await translator.translate(translateURL);
-	renderTranslation(translation);
-
-	return translation;
-}
 
 function getOriginalText() {
 	appState.srcText = document.getElementById('src-text').value;
 
-	if (appState.srcText !== '' && appState.srcText !== ' ') {
-		getTranslation(appState.srcText);
-
-		return appState.srcText;
-	}
-
 	return appState.srcText;
 }
 
-
-async function detectSrcLang() {
+async function getDetectedSrcLang() {
 	let selectSrcID = 'src-langs-list';
+	let srcLang = appState.srcLang;
 
-	unselect(selectSrcID, appState.srcLang);
-
+	unselect(selectSrcID, srcLang);
 	detectURL = await urlHelper.composeDetectURL();
-	appState.srcLang = await translator.detect(detectURL);
-
-	select(selectSrcID, appState.srcLang);
+	srcLang = await translator.detect(detectURL);
+	select(selectSrcID, srcLang);
+	appState.srcLang = srcLang;
 
 	return appState.srcLang;
 }

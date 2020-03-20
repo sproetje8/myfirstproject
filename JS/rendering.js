@@ -14,8 +14,6 @@ function unselect(selectID, languageAbbr) {
 			break;
 		}
 	}
-
-	return selectElement;
 }
 
 function select(selectID, optionValToSelect) {
@@ -30,4 +28,10 @@ function select(selectID, optionValToSelect) {
 			break;
 		}
 	}
+}
+
+function moveTranslationToInput() {
+	let translationValue = document.getElementById('translation').value;
+	appState.srcText = translationValue;
+	document.getElementById('src-text').value = appState.srcText;
 }

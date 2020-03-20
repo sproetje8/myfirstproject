@@ -1,8 +1,24 @@
 let listeners = [
-	{ id: 'src-langs-list', event: 'change', handler: srcLangBtnHandler },
-	{ id: 'targ-langs-list', event: 'change', handler: setTargLang },
-	{ id: 'switch-lang', event: 'click', handler: switchLanguages },
-	{ id: 'src-text', event: 'keyup', handler: inputDebouncer }
+	{
+		id: 'src-langs-list',
+		event: 'change',
+		handler: srcLangBtnHandler
+	},
+	{
+		id: 'targ-langs-list',
+		event: 'change',
+		handler: targLangBtnHandler
+	},
+	{
+		id: 'switch-lang',
+		event: 'click',
+		handler: switchBtnHandler
+	},
+	{
+		id: 'src-text',
+		event: 'keyup',
+		handler: inputDebouncer
+	}
 ];
 
 function addListener({ id, event, handler }) {
