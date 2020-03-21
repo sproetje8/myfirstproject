@@ -4,9 +4,10 @@ const apiAddress = 'https://translate.yandex.net/api/v1.5/tr.json/';
 const apiMethods = ['getLangs', 'detect', 'translate'];
 
 function getConfig() {
-	return {
+	return Object.freeze({
 		apiKey,
 		apiAddress,
 		apiMethods
-	}
+	})
 }
+

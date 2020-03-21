@@ -1,4 +1,74 @@
-const inputDebouncer = debounce(createTranslation, 2000);
+const utils = {
+	inputDebouncer: function () {
+		debounce(utils.getTranslation, 2000);
+	},
+	sortLanguageList: function (langs) {
+		return Object.entries(langs).sort(utils.compareByLang);
+	},
+	compareByLang: function (a, b) {
+		if (a[1] < b[1]) return -1;
+		if (a[1] > b[1]) return 1;
+		return 0;
+	},
+	checkForInput: function () {
+		let input = state.srcText;
+		return input ? true : false; 
+	},
+	getTranslation: async function () {
+		state.srcText = utils.getInput();
+		let lang = utils.composeLang();
+		let translateURL = urlHelper.composeTranslateURL(lang);
+		return state.translation = await translator.translate(translateURL);
+	},
+	// setSrcLang: function () {
+	// 	// let selectID = 'src-langs-list';
+	// 	let elementValue = event.target.value;
+	// 	// unselect(selectID, state.srcLang);
+	// 	state.srcLang = elementValue;
+	// 	// select(selectID, state.srcLang);
+	// },
+	setTargLang: function (event) {
+		// let selectID = 'targ-langs-list';
+		let elementValue = event.target.value;
+		// unselect(selectID, state.targLang);
+		state.targLang = elementValue;
+		// select(selectID, state.targLang);
+	},
+	swapSrcAndTargLangs: function () {
+		let selectSrcID = 'src-langs-list';
+		let selectTargID = 'targ-langs-list';
+
+		let selectSrcValue = document.getElementById(selectSrcID).value;
+		let selectTargValue = document.getElementById(selectTargID).value;
+
+		// unselect(selectSrcID, selectSrcValue);
+		// unselect(selectTargID, selectTargValue);
+		// select(selectSrcID, selectTargValue);
+		// select(selectTargID, selectSrcValue);
+
+		state.srcLang = selectTargValue;
+		state.targLang = selectSrcValue;
+	},
+	getInput: function () {
+		return document.getElementById('src-text').value;
+	},
+	// getDetectedSrcLang: async function () {
+	// 	let detectURL = urlHelper.composeDetectURL();
+	// 	let srcLang = await translator.detect(detectURL);
+	// 	let selectSrcID = 'src-langs-list';
+	// 	let srcLangOldValue = state.srcLang;	
+		
+	// 	return state.srcLang;
+	// },
+	composeLang: function () {
+		return `${state.srcLang}-${state.targLang}`;
+	},
+	// check: if (srcLang) {
+	// 	state.srcLang = srcLang;
+	// 	unselect(selectSrcID, srcLangOldValue);
+	// 	select(selectSrcID, srcLang);
+	// }
+}
 
 function debounce(func, delay) {
 	let timer;
@@ -12,87 +82,4 @@ function debounce(func, delay) {
 			func.apply(context, args);
 		}, delay);
 	};
-}
-
-async function createTranslation() {
-	appState.srcText = getOriginalText();
-	detectedSrcLang = await getDetectedSrcLang(appState.srcText);
-	appState.srcLang = appState.srcLang || detectedSrcLang;
-	let lang = composeLang();
-	let translateURL = urlHelper.composeTranslateURL(lang);
-	let translation = await translator.translate(translateURL);
-	renderTranslation(translation);
-}
-
-function switchBtnHandler() {
-	swapSrcAndTargLangs();
-	moveTranslationToInput();
-	createTranslation();
-}
-
-function swapSrcAndTargLangs() {
-	let selectSrcID = 'src-langs-list';
-	let selectTargID = 'targ-langs-list';
-
-	let selectSrcValue = document.getElementById(selectSrcID).value;
-	let selectTargValue = document.getElementById(selectTargID).value;
-
-	unselect(selectSrcID, selectSrcValue);
-	unselect(selectTargID, selectTargValue);
-	select(selectSrcID, selectTargValue);
-	select(selectTargID, selectSrcValue);
-
-	appState.srcLang = selectTargValue;
-	appState.targLang = selectSrcValue;
-}
-
-function srcLangBtnHandler(event) {
-	setSrcLang(event);
-	createTranslation();
-}
-
-function targLangBtnHandler(event) {
-	setTargLang(event);
-	createTranslation();
-}
-
-function setSrcLang(event) {
-	let selectID = 'src-langs-list';
-	let elementValue = event.target.value;
-	unselect(selectID, appState.srcLang);
-	appState.srcLang = elementValue;
-	select(selectID, appState.srcLang);
-}
-
-function setTargLang(event) {
-	let selectID = 'targ-langs-list';
-	let elementValue = event.target.value;
-	unselect(selectID, appState.targLang);
-	appState.targLang = elementValue;
-	select(selectID, appState.targLang);
-}
-
-// think about how to get what user typed and send it to yandex
-
-function getOriginalText() {
-	appState.srcText = document.getElementById('src-text').value;
-
-	return appState.srcText;
-}
-
-async function getDetectedSrcLang() {
-	let selectSrcID = 'src-langs-list';
-	let srcLang = appState.srcLang;
-
-	unselect(selectSrcID, srcLang);
-	detectURL = await urlHelper.composeDetectURL();
-	srcLang = await translator.detect(detectURL);
-	select(selectSrcID, srcLang);
-	appState.srcLang = srcLang;
-
-	return appState.srcLang;
-}
-
-function composeLang() {
-	return `${appState.srcLang}-${appState.targLang}`;
 }

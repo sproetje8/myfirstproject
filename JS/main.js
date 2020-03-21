@@ -4,11 +4,14 @@
 // 5.Паттерны проектирования (Observer, Singleton, Factory...)
 
 let CONFIG = {};
+let sortedLangsList;
+let state;
 
 async function init() {
 	CONFIG = getConfig();
-	Object.freeze(CONFIG);
-	await initLanguages();
+	state = appState.getAppState();
+	sortedLangsList = await initLanguages();
+	renderer.populateLanguageList(sortedLangsList);
 	createListeners();
 }
 

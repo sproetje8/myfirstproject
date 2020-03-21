@@ -1,5 +1,10 @@
 let appState = {
-	srcLang: 'en',
-	targLang: 'ru',
-	srcText: ''
+	getAppState: function() {
+		return {
+			srcLang: 'en',
+			targLang: 'ru',
+			srcText: '',
+			translation: ''
+		}
+	}
 }
