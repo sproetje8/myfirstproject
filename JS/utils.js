@@ -1,7 +1,4 @@
 const utils = {
-	inputDebouncer: function () {
-		debounce(utils.getTranslation, 2000);
-	},
 	sortLanguageList: function (langs) {
 		return Object.entries(langs).sort(utils.compareByLang);
 	},
@@ -11,14 +8,19 @@ const utils = {
 		return 0;
 	},
 	checkForInput: function () {
-		let input = state.srcText;
-		return input ? true : false; 
+		let str = state.srcText.replace(/\s/g, '');
+		
+		return str.length ? true : false;
 	},
 	getTranslation: async function () {
 		state.srcText = utils.getInput();
-		let lang = utils.composeLang();
-		let translateURL = urlHelper.composeTranslateURL(lang);
-		return state.translation = await translator.translate(translateURL);
+		text = utils.checkForInput();
+		if (text) {
+			let lang = utils.composeLang();
+			let translateURL = urlHelper.composeTranslateURL(lang);
+			return state.translation = await translator.translate(translateURL);
+		}
+		// renderer.renderTranslation(state.translation);
 	},
 	// setSrcLang: function () {
 	// 	// let selectID = 'src-langs-list';
@@ -50,36 +52,22 @@ const utils = {
 		state.targLang = selectSrcValue;
 	},
 	getInput: function () {
-		return document.getElementById('src-text').value;
+		return document.getElementById('src-text').value.trim();
 	},
 	// getDetectedSrcLang: async function () {
 	// 	let detectURL = urlHelper.composeDetectURL();
 	// 	let srcLang = await translator.detect(detectURL);
 	// 	let selectSrcID = 'src-langs-list';
 	// 	let srcLangOldValue = state.srcLang;	
-		
+
 	// 	return state.srcLang;
 	// },
 	composeLang: function () {
 		return `${state.srcLang}-${state.targLang}`;
-	},
+	}
 	// check: if (srcLang) {
 	// 	state.srcLang = srcLang;
 	// 	unselect(selectSrcID, srcLangOldValue);
 	// 	select(selectSrcID, srcLang);
 	// }
-}
-
-function debounce(func, delay) {
-	let timer;
-
-	return function () {
-		let context = this;
-		let args = arguments;
-
-		clearTimeout(timer);
-		timer = setTimeout(() => {
-			func.apply(context, args);
-		}, delay);
-	};
 }

@@ -29,49 +29,69 @@ function createListeners() {
 	listeners.forEach(element => addListener(element));
 }
 
-function srcLangBtnHandler(event) {
+async function srcLangBtnHandler(event) {
 	state.srcText = utils.getInput();
-	state.Lang = event.target.value;
+	state.srcLang = event.target.value;
 	let input = utils.checkForInput();
 	if (input) {
-		utils.getTranslation();
-		renderer.renderTranslation();
+		let translation = await utils.getTranslation();
+		renderer.renderTranslation(translation);
 	}
 }
 
-function targLangBtnHandler(event) {
+async function targLangBtnHandler(event) {
 	state.srcText = utils.getInput();
 	state.targLang = event.target.value;
 	let input = utils.checkForInput();
 	if (input) {
-		utils.getTranslation();
-		renderer.renderTranslation();
+		let translation = await utils.getTranslation();
+		renderer.renderTranslation(translation);
 	}
 }
 
-function switchBtnHandler() {
+async function switchBtnHandler() {
 	state.srcText = utils.getInput();
 	let input = utils.checkForInput();
-	
+
 	utils.swapSrcAndTargLangs();
 	renderer.renderSrcLang();
 	renderer.renderTargLang();
+	// state.translation = 'Enter your text';
 
 	if (input) {
 		renderer.moveTranslationToInput();
-		utils.getTranslation();
-		renderer.renderTranslation();
+		console.log(state.srcText);
+		let translation = await utils.getTranslation();
+		renderer.renderTranslation(translation);
 	}
 }
 
-function inputHandler() {
+const inputDebouncer = debounce(utils.getTranslation, 2000);
+
+function debounce(func, delay) {
+	let timer = null;
+	let promise;
+
+	return (...args) => {
+		clearTimeout(timer);
+		return promise = new Promise((resolve) => {
+			timer = setTimeout(
+				() => resolve(func(...args)), 
+				delay
+			);
+		});
+	};
+}
+
+async function inputHandler() {
 	state.srcText = utils.getInput();
 	let input = utils.checkForInput();
 
 	if (input) {
-		// state.srcText = utils.getInput();
-		// state.srcLang = await utils.getDetectedSrcLang();
-		let translation = utils.inputDebouncer();
+		let translation = await inputDebouncer();
 		renderer.renderTranslation(translation);
+	} else {
+		state.translation = '';
+		renderer.renderTranslation(state.translation);
 	}
 }

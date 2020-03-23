@@ -25,8 +25,7 @@ let renderer = {
 			selectTargLang.add(optionTarg);
 		});
 	},
-	renderTranslation: function () {
-		let translation = state.translation;
+	renderTranslation: function (translation) {
 		const translationField = document.getElementById('translation');
 		translationField.innerText = translation;
 	},

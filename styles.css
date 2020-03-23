@@ -4,6 +4,7 @@ body {
 	margin: 0;
 	width: 100%;
 	height: 100%;
+	background-color: gray;
 }
 
 .container {
@@ -14,7 +15,7 @@ body {
 	width: 1200px;
 	height: 200px;
 	margin: 0 auto;
-	background-color: white;
+	background-color: inherit;
 	padding: 0;
 }
 
@@ -29,12 +30,13 @@ body {
 
 #switch-lang {
 	position: relative;
+	top: 2px;
 	padding: 0;
 	margin: 0;
 	width: 96px;
 	height: 46px;
 	border: none;
-	background-color: white;
+	background-color: ivory;
 	font-size: 40px;
 	font-weight: bold;
 	cursor: pointer;
