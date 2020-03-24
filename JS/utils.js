@@ -12,6 +12,11 @@ const utils = {
 		
 		return str.length ? true : false;
 	},
+	detectLanguage: async function () {
+		state.srcText = utils.getInput();
+		let detectURL = urlHelper.composeDetectURL();
+		return state.srcLang = await translator.detect(detectURL);
+	},
 	getTranslation: async function () {
 		state.srcText = utils.getInput();
 		text = utils.checkForInput();

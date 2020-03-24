@@ -60,7 +60,6 @@ async function switchBtnHandler() {
 
 	if (input) {
 		renderer.moveTranslationToInput();
-		console.log(state.srcText);
 		let translation = await utils.getTranslation();
 		renderer.renderTranslation(translation);
 	}
@@ -88,6 +87,8 @@ async function inputHandler() {
 	let input = utils.checkForInput();
 
 	if (input) {
+		state.srcLang = await utils.detectLanguage();
+		renderer.renderSrcLang();
 		let translation = await inputDebouncer();
 		renderer.renderTranslation(translation);
 	} else {
